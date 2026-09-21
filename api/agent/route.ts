@@ -3,6 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    route: "agent",
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const apiKey = process.env.OPENAI_API_KEY;
@@ -10,21 +17,16 @@ export async function POST(req: NextRequest) {
     if (!apiKey) {
       return NextResponse.json(
         {
-          error:
-            "OPENAI_API_KEY is not configured on Netlify.",
+          error: "OPENAI_API_KEY is not configured on Netlify.",
         },
         { status: 500 }
       );
     }
 
     const body = await req.json();
-
     const message = body?.message;
 
-    if (
-      typeof message !== "string" ||
-      !message.trim()
-    ) {
+    if (typeof message !== "string" || !message.trim()) {
       return NextResponse.json(
         {
           error: "Message is required.",
@@ -38,13 +40,9 @@ export async function POST(req: NextRequest) {
     });
 
     const response = await openai.responses.create({
-      model:
-        process.env.OPENAI_MODEL ||
-        "gpt-5.6-luna",
-
+      model: process.env.OPENAI_MODEL || "gpt-5.6-luna",
       instructions:
-        "You are the AI assistant inside an Agentic UI. Help the user build websites, write code, debug projects, explain programming, and work with files. Give clear and useful answers.",
-
+        "You are the AI assistant inside an Agentic UI. Help the user build websites, write code, debug projects, explain programming, and work with files. Give clear, useful and practical answers.",
       input: message,
     });
 
